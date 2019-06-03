@@ -26,7 +26,7 @@ from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
 from sqlalchemy.orm import load_only
-from sqlalchemy import func
+from sqlalchemy import func, or_, and_
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import (
     BadRequest,
@@ -1001,10 +1001,20 @@ class Resource(ModelView):
     """Get existing relationship if exists, and update updated_at"""
 
     relationship = self.model.query.filter(
-        self.model.source_id == src["source"]["id"],
-        self.model.source_type == src["source"]["type"],
-        self.model.destination_id == src["destination"]["id"],
-        self.model.destination_type == src["destination"]["type"]
+        or_(
+            and_(
+                self.model.source_id == src["source"]["id"],
+                self.model.source_type == src["source"]["type"],
+                self.model.destination_id == src["destination"]["id"],
+                self.model.destination_type == src["destination"]["type"]
+            ),
+            and_(
+                self.model.source_id == src["destination"]["id"],
+                self.model.source_type == src["destination"]["type"],
+                self.model.destination_id == src["source"]["id"],
+                self.model.destination_type == src["source"]["type"]
+            ),
+        )
     ).first()
     if relationship:
       # Manually trigger relationship update in order for revisions and

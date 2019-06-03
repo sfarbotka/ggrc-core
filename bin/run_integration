@@ -10,4 +10,4 @@ source "${SCRIPTPATH}/init_test_env"
 db_reset -d "ggrcdevtest"
 
 echo -e "\nRunning integration tests"
-nosetests integration --with-xunit --logging-clear-handlers ${@:1}
+nosetests integration/ggrc/models/test_relationship.py --with-xunit --logging-clear-handlers ${@:1}
